@@ -30,7 +30,7 @@ function useCrudApi() {
   
         case 'PUT':
         case 'PATCH':
-          setData((prev) => prev.map(i =>i.id === res.data.id ? res.data : i));
+          setData((prev) => prev.map(i =>{ return i.id === res.data.id ? res.data : i}));
           break;
   
         case 'DELETE':

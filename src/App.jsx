@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useCrudApi from './hooks/useCrudApi'
+import { use } from 'react'
 
 // 
 
@@ -20,32 +21,49 @@ function App() {
  const [edit, setEdit] = useState(null)
 
  useEffect(() => {
- request({url: baseUrl + 'users'})
+ request({url: baseUrl + 'users/'})
  
  }, [])
 
 const add  = (user)=>{
   
  request({
-  url: baseUrl +`users/${id}`,
+  url: baseUrl +'users/',
   method: 'POST',
   body: user
  })
  
 }
 
-const handleEdit  = ( ) => {
-  console.log('editing')
+const handleEdit  = ( user) => {
+ 
+  setEdit(user.id)
+  setValues(user)
 }
+
+const handleCancel  = () => {
+  
+  setEdit(null)
+  setValues(initialValues)
+}
+
 const remove = (id) =>{
   console.log('remove', id)
   request({
-  url: baseUrl +'users',
+  url: baseUrl +'users/',
   method: 'DELETE',
   id
 
   })
 }
+  const update = (id, userEdit) =>{
+
+    request({
+      url: baseUrl +`users/${id}`,
+      method: 'PUT',
+      body: userEdit
+     })
+  }
 
  const handleChange = ({name, value}) =>{
   
@@ -57,10 +75,17 @@ const remove = (id) =>{
 
 }
 
+
  const handleSubmit = (e) =>{
   e.preventDefault()
+  if(edit){
+    update(edit, values)
+    setEdit(null)
+  }else{
+    add(values)
+  }
+  setValues(initialValues)
   
-  add(values)
  }
 
 
@@ -140,8 +165,13 @@ const remove = (id) =>{
         </label>
       </div>
    
-     <button type='submit'  className='btn'>Create</button>
+     <button type='submit'
+       className={edit ?'btn bg-amber-300' : 'btn'   }>{edit ? 'Edit': 'Create'}</button>
+    
+    {edit && <button onClick={handleCancel} className='btn bg-black text-white ml-2'>Cancel</button>}
+    
     </form>
+    {error && <p  className='mt-5 px-4 text-red-600 '>{error}</p>}
      
      {pending ? <p>Loading...</p> : 
      <ul>
@@ -176,6 +206,7 @@ const remove = (id) =>{
    
      }
     
+    {users.length === 0 && <p className='mt-5 px-4'>No users found</p>}
     </div>
   )
 }
